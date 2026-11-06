@@ -1,0 +1,6 @@
+# 服务器自带、不能被 --delete 删除的文件（rsync filter 规则，必须 LF）
+# 以点开头的全部保护：.well-known / .htaccess / .user.ini / .ftpquota 等
+.*
+
+# 服务器初始 404 页（若以后本站自己生成 404.html，删掉这一行）
+/404.html

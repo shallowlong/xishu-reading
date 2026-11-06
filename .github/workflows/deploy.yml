@@ -1,18 +1,16 @@
 name: 部署「奚叔阅读」到阿里云
 
-# 推送 main 或手动触发：构建 Hexo，再用 FTP 镜像同步到 reading.xishu2099.top
+# 推送 main 或手动触发：构建 Hexo，再用 rsync over SSH 同步到 reading.xishu2099.top
 #
-# 需要在仓库 Settings → Secrets and variables → Actions 配置：
-#   FTP_SERVER     必填，FTP 主机
-#   FTP_USERNAME   必填，FTP 账号
-#   FTP_PASSWORD   必填，FTP 密码
-#   FTP_SERVER_DIR 选填，FTP 登录后的站点目录；默认 . 表示登录目录
-#                  （宝塔/虚拟主机的 FTP 账号通常已 chroot 到站点根目录；
-#                   若登录后不是站点根，再设为 /www/wwwroot/reading.xishu2099.top）
-#   FEISHU_WEBHOOK 选填，飞书机器人 webhook，不填则跳过通知
+# 与 xishu-website 使用同一套部署方式，仓库 Secrets 需要：
+#   ALIYUN_HOST     服务器 IP 或域名
+#   ALIYUN_USER     SSH 用户
+#   ALIYUN_SSH_KEY  SSH 私钥（PEM 全文，含 BEGIN/END 行）
+#   FEISHU_WEBHOOK  选填，飞书机器人 webhook，不填则跳过通知
 #
-# 服务器上由宝塔生成的 .well-known / .htaccess / .user.ini / 404.html
-# 不参与同步，避免被 --delete 清掉。
+# 目标目录：/www/wwwroot/reading.xishu2099.top
+# 服务器自带的 .well-known / .htaccess / .user.ini 与初始 404.html 由仓库根的
+# .rsync-exclude 保护，不会被 --delete 清掉（规则文件用 LF，避免 \r 导致匹配失败）。
 
 on:
   push:
@@ -41,42 +39,45 @@ jobs:
         run: npm ci
 
       - name: 生成静态文件
-        run: npm run build
+        run: npm run clean && npm run build
         env:
           HEXO_ENV: production
 
-      - name: 安装 lftp
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
-
-      - name: FTP 镜像同步到阿里云
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR || '.' }}
+      - name: 检查部署排除规则
         run: |
-          missing=""
-          if [ -z "$FTP_SERVER" ]; then missing="$missing FTP_SERVER"; fi
-          if [ -z "$FTP_USERNAME" ]; then missing="$missing FTP_USERNAME"; fi
-          if [ -z "$FTP_PASSWORD" ]; then missing="$missing FTP_PASSWORD"; fi
-          if [ -n "$missing" ]; then
-            echo "缺少必填 Secrets:$missing"
-            echo "请在仓库 Settings → Secrets and variables → Actions 中配置"
-            exit 1
-          fi
+          test -f .rsync-exclude
+          echo "以下路径受保护，--delete 不会删除："
+          cat .rsync-exclude
 
-          cat > "$RUNNER_TEMP/deploy.lftp" <<EOF
-          set cmd:fail-exit yes
-          set ftp:ssl-allow no
-          set net:timeout 30
-          set net:max-retries 3
-          open -u "$FTP_USERNAME","$FTP_PASSWORD" "ftp://$FTP_SERVER"
-          cd "$FTP_SERVER_DIR"
-          mirror -R --delete --parallel=4 --verbose -x '\.well-known' -x '\.htaccess' -x '\.user\.ini' -x '404\.html' ./public/ .
-          bye
-          EOF
+      - name: 部署到阿里云
+        uses: easingthemes/ssh-deploy@v2.2.6 # 与 xishu-website 保持一致，固定版本
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+          ARGS: "-avz --delete --exclude-from=.rsync-exclude"
+          SOURCE: "public/"
+          REMOTE_HOST: ${{ secrets.ALIYUN_HOST }}
+          REMOTE_USER: ${{ secrets.ALIYUN_USER }}
+          TARGET: "/www/wwwroot/reading.xishu2099.top"
 
-          lftp -f "$RUNNER_TEMP/deploy.lftp"
+      - name: 校验受保护文件仍在
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.ALIYUN_HOST }}
+          REMOTE_USER: ${{ secrets.ALIYUN_USER }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=15 \
+            "$REMOTE_USER@$REMOTE_HOST" '
+              cd /www/wwwroot/reading.xishu2099.top || exit 1
+              test -d .well-known || { echo "缺少 .well-known"; exit 1; }
+              test -f .htaccess  || { echo "缺少 .htaccess"; exit 1; }
+              test -f .user.ini  || { echo "缺少 .user.ini"; exit 1; }
+              echo "受保护文件均存在：.well-known / .htaccess / .user.ini"
+            '
 
       - name: 发送飞书通知（成功）
         if: success()
