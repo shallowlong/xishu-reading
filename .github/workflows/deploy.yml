@@ -2,7 +2,10 @@ name: 部署「奚叔阅读」到阿里云
 
 # 推送 main 或手动触发：构建 Hexo，再用 rsync over SSH 同步到 reading.xishu2099.top
 #
-# 与 xishu-website 使用同一套部署方式，仓库 Secrets 需要：
+# 不使用第三方 deploy action，改为显式写入私钥 + rsync：
+# 私钥写入前会去掉 \r，避免 Windows 粘贴导致的 "error in libcrypto"。
+#
+# 仓库 Secrets 需要：
 #   ALIYUN_HOST     服务器 IP 或域名
 #   ALIYUN_USER     SSH 用户
 #   ALIYUN_SSH_KEY  SSH 私钥（PEM 全文，含 BEGIN/END 行）
@@ -49,26 +52,52 @@ jobs:
           echo "以下路径受保护，--delete 不会删除："
           cat .rsync-exclude
 
-      - name: 部署到阿里云
-        uses: easingthemes/ssh-deploy@v2.2.6 # 与 xishu-website 保持一致，固定版本
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SSH_KEY }}
-          ARGS: "-avz --delete --exclude-from=.rsync-exclude"
-          SOURCE: "public/"
-          REMOTE_HOST: ${{ secrets.ALIYUN_HOST }}
-          REMOTE_USER: ${{ secrets.ALIYUN_USER }}
-          TARGET: "/www/wwwroot/reading.xishu2099.top"
-
-      - name: 校验受保护文件仍在
+      - name: 部署到阿里云（rsync over SSH）
         env:
           SSH_PRIVATE_KEY: ${{ secrets.ALIYUN_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.ALIYUN_HOST }}
           REMOTE_USER: ${{ secrets.ALIYUN_USER }}
         run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh -i ~/.ssh/deploy_key \
+          set -e
+          install -m 700 -d "$HOME/.ssh"
+          KEY="$HOME/.ssh/deploy_key"
+          PUB="$HOME/.ssh/deploy_key.pub"
+
+          # 先去掉 \r：从 Windows 粘贴的 Secret 可能带 CRLF
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$KEY"
+          chmod 600 "$KEY"
+
+          if ! ssh-keygen -y -P "" -f "$KEY" > "$PUB" 2>/dev/null; then
+            echo "私钥格式异常（常见原因：换行丢失、CRLF、带字面量 \\n），尝试重建换行……"
+            begin='-----BEGIN OPENSSH PRIVATE KEY-----'
+            end='-----END OPENSSH PRIVATE KEY-----'
+            raw=$(tr -d '\r' < "$KEY" | tr -d '\n')
+
+            if [ "${raw#*"$begin"}" != "$raw" ] && [ "${raw#*"$end"}" != "$raw" ]; then
+              body=${raw#*"$begin"}
+              body=${body%%"$end"*}
+              body=$(printf '%s' "$body" | sed 's/\\n//g' | tr -d '[:space:]')
+              {
+                printf '%s\n' "$begin"
+                printf '%s' "$body" | fold -w 70
+                printf '\n%s\n' "$end"
+              } > "$KEY"
+              chmod 600 "$KEY"
+            fi
+          fi
+
+          if ! ssh-keygen -y -P "" -f "$KEY" > "$PUB" 2>/dev/null; then
+            echo "ALIYUN_SSH_KEY 仍不是有效的 OpenSSH 私钥。"
+            echo "请重新复制完整私钥（含 BEGIN/END 两行、保留换行、不要带引号）后更新 Secret。"
+            exit 1
+          fi
+          echo "私钥校验通过：$(ssh-keygen -lf "$PUB" | awk '{print $2}')"
+
+          rsync -avz --delete --exclude-from=.rsync-exclude \
+            -e "ssh -i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=15" \
+            public/ "$REMOTE_USER@$REMOTE_HOST:/www/wwwroot/reading.xishu2099.top/"
+
+          ssh -i "$HOME/.ssh/deploy_key" \
             -o StrictHostKeyChecking=no \
             -o ConnectTimeout=15 \
             "$REMOTE_USER@$REMOTE_HOST" '
