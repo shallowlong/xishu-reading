@@ -1,0 +1,4 @@
+# GitHub Actions 的 run 脚本里有 heredoc，必须是 LF
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf

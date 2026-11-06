@@ -1,0 +1,16 @@
+<%
+  var s = paper_series_of(post);
+%>
+<article class="card" data-path="<%= url_for(post.path) %>">
+  <a class="card-link" href="<%= url_for(post.path) %>">
+    <span class="card-kicker"><%= s ? s.name : '阅读' %></span>
+    <h3 class="card-title"><%= post.title %></h3>
+    <p class="card-dek"><%= paper_excerpt(post.content, 72) %></p>
+    <span class="card-meta">
+      <time datetime="<%= date(post.date, 'YYYY-MM-DD') %>"><%= date(post.date, 'MM-DD') %></time>
+      <span class="dot">·</span>
+      <span>约 <%= paper_reading_time(post.content) %> 分钟</span>
+      <span class="card-read">已读</span>
+    </span>
+  </a>
+</article>

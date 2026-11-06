@@ -1,0 +1,31 @@
+{
+  "name": "xishu-reading",
+  "version": "1.0.0",
+  "private": true,
+  "author": "XISHU <shallowlong@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "hexo clean && hexo server -p 7777",
+    "serve": "hexo server -p 7777",
+    "build": "hexo generate",
+    "clean": "hexo clean",
+    "new": "hexo new",
+    "new:insight": "node tools/new-post.js insight",
+    "new:insight-weekly": "node tools/new-post.js insight-weekly",
+    "new:weekly": "node tools/new-post.js weekly",
+    "new:zhihu": "node tools/new-post.js zhihu"
+  },
+  "hexo": {
+    "version": "8.1.2"
+  },
+  "dependencies": {
+    "hexo": "^8.1.2",
+    "hexo-generator-archive": "^2.0.0",
+    "hexo-generator-category": "^2.0.0",
+    "hexo-generator-index": "^4.0.0",
+    "hexo-generator-tag": "^2.0.0",
+    "hexo-renderer-ejs": "^2.0.0",
+    "hexo-renderer-marked": "^7.0.0",
+    "hexo-server": "^3.0.0"
+  }
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="paper" data-size="m">
+<head>
+  <%- partial('_partial/head') %>
+</head>
+<body data-layout="<%= page.layout || (page.__index ? 'index' : 'page') %>" data-path="<%= url_for(page.path || '/') %>">
+  <div class="reading-progress" id="readingProgress" aria-hidden="true"><span></span></div>
+  <%- partial('_partial/masthead') %>
+  <main class="paper-main">
+    <%- body %>
+  </main>
+  <%- partial('_partial/footer') %>
+  <script src="<%= url_for('/js/newspaper.js') %>?v=<%= theme.paper.version || 1 %>" defer></script>
+</body>
+</html>

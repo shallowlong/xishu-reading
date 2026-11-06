@@ -1,0 +1,44 @@
+# 报纸版式主题配置
+
+paper:
+  # 报头名称与副题（留空则用站点 config.title / subtitle）
+  title: 奚叔阅读
+  subtitle: 我所收集和创建的阅读内容集合
+  # 报头工具条右侧的小字
+  tagline: 持续收集 · 慢慢读
+  # 页脚「关于本站」
+  about: 收集和整理值得慢慢读的内容：AI 政策洞察、AI 驱动的服装电商、知乎高赞精选。不追热点，只留读完还能记住的部分。
+  # 头版最多排几篇（其余去归档看）
+  front_limit: 11
+  # 版权起始年：页脚自动显示 2026 或 2026-2027（结束年取构建时的年份）
+  since: 2026
+  # 静态资源版本号，改样式后 +1 可破缓存
+  version: 3
+
+# 顶部导航（系列会自动追加在后面）
+nav:
+  - name: 首页
+    path: /
+  - name: 归档
+    path: /archives/
+
+# 系列登记：key 与文章 front-matter 的 series 字段对应
+# path 用于 URL：/series/<path>/
+# 这里的顺序就是报头导航里系列出现的顺序
+series:
+  ai-insight:
+    name: AI 政策洞察
+    path: ai-insight
+    desc: 每个工作日一份 AI 政策信号简报，追踪政策、监管与产业动向。
+  ai-insight-weekly:
+    name: AI 政策洞察 · 周报
+    path: ai-insight-weekly
+    desc: 每周一份回看，把一周的 AI 政策信号串成趋势，看清方向而不是看热闹。
+  ai-ecom-weekly:
+    name: AI 驱动服装电商
+    path: ai-ecom-weekly
+    desc: 每周一份 AI × 服装电商趋势周报，面向童装 / 女装 / 男装卖家。
+  zhihu-top:
+    name: 知乎高赞精选
+    path: zhihu-top
+    desc: 把一天里值得看的高赞回答整理成一期内容，省下刷信息流的时间。

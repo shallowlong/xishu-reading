@@ -1,0 +1,22 @@
+<%
+  var siteTitle = theme.paper.title || config.title;
+  var pageTitle = page.title ? page.title + ' · ' + siteTitle : siteTitle + (config.subtitle ? ' · ' + config.subtitle : '');
+  var rawDesc = page.description || page.excerpt || page.content || config.description || '';
+  var pageDesc = strip_html(rawDesc).replace(/\s+/g, ' ').trim().slice(0, 120);
+  var pageUrl = (config.url + url_for(page.path || '/')).replace(/index\.html$/, '');
+  var themeInit = "(function(){var d=document.documentElement;try{var t=localStorage.getItem('paper.theme');var s=localStorage.getItem('paper.size');if(t==='night'||t==='paper'){d.setAttribute('data-theme',t);}if(s==='s'||s==='m'||s==='l'){d.setAttribute('data-size',s);}}catch(e){}})();";
+%>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f2e8">
+  <title><%= pageTitle %></title>
+  <meta name="description" content="<%= pageDesc %>">
+  <meta name="author" content="<%= page.author || config.author %>">
+  <link rel="canonical" href="<%= pageUrl %>">
+  <meta property="og:type" content="<%= page.layout === 'post' ? 'article' : 'website' %>">
+  <meta property="og:title" content="<%= page.title || siteTitle %>">
+  <meta property="og:description" content="<%= pageDesc %>">
+  <meta property="og:url" content="<%= pageUrl %>">
+  <meta property="og:site_name" content="<%= siteTitle %>">
+  <script><%- themeInit %></script>
+  <link rel="stylesheet" href="<%= url_for('/css/newspaper.css') %>?v=<%= theme.paper.version || 1 %>">

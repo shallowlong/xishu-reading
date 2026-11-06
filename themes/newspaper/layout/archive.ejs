@@ -1,0 +1,45 @@
+<%
+  var posts = page.posts ? page.posts.toArray() : [];
+  var headTitle = page.category || page.tag || '内容归档';
+  var groups = {};
+  posts.forEach(function (post) {
+    var year = date(post.date, 'YYYY');
+    (groups[year] = groups[year] || []).push(post);
+  });
+  var years = Object.keys(groups).sort().reverse();
+%>
+<div class="section-front">
+  <header class="section-front-head">
+    <p class="kicker">Archive</p>
+    <h1><%= headTitle %></h1>
+    <p class="section-desc">所有已发布的内容，按时间倒序排列。</p>
+    <p class="section-meta">共 <%= posts.length %> 篇<% if (years.length) { %> · 自 <%= years[years.length - 1] %> 年起<% } %></p>
+  </header>
+
+  <% years.forEach(function (year) { %>
+    <section class="archive-year">
+      <h2 class="archive-year-title"><%= year %><span><%= groups[year].length %> 篇</span></h2>
+      <div class="section-list">
+        <% groups[year].forEach(function (post) { %>
+          <%
+            var s = paper_series_of(post);
+          %>
+          <article class="list-item" data-path="<%= url_for(post.path) %>">
+            <a href="<%= url_for(post.path) %>">
+              <time datetime="<%= date(post.date, 'YYYY-MM-DD') %>"><%= date(post.date, 'MM-DD') %></time>
+              <div class="list-main">
+                <h3 class="list-title"><%= post.title %></h3>
+                <p class="list-dek"><%= paper_excerpt(post.content, 80) %></p>
+              </div>
+              <span class="list-meta"><%= s ? s.name : '' %><span class="card-read">已读</span></span>
+            </a>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+  <% }) %>
+
+  <% if (!posts.length) { %>
+    <p class="section-empty">这一版还没有内容。</p>
+  <% } %>
+</div>

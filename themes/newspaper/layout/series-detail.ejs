@@ -1,0 +1,36 @@
+<%
+  var s = page.series;
+  var posts = s.posts || [];
+  var lastMonth = '';
+%>
+<div class="section-front">
+  <header class="section-front-head">
+    <p class="kicker">Series</p>
+    <h1><%= s.name %></h1>
+    <% if (s.desc) { %><p class="section-desc"><%= s.desc %></p><% } %>
+    <p class="section-meta">
+      共 <%= s.count %> 期 · 更新于 <%= date(s.latest.date, 'YYYY-MM-DD') %>
+    </p>
+  </header>
+
+  <div class="section-list">
+    <% posts.forEach(function (post) { %>
+      <%
+        var mk = date(post.date, 'YYYY年M月');
+      %>
+      <% if (mk !== lastMonth) { lastMonth = mk; %>
+        <h2 class="list-month"><%= mk %></h2>
+      <% } %>
+      <article class="list-item" data-path="<%= url_for(post.path) %>">
+        <a href="<%= url_for(post.path) %>">
+          <time datetime="<%= date(post.date, 'YYYY-MM-DD') %>"><%= date(post.date, 'MM-DD') %></time>
+          <div class="list-main">
+            <h3 class="list-title"><%= post.title %></h3>
+            <p class="list-dek"><%= paper_excerpt(post.content, 90) %></p>
+          </div>
+          <span class="list-meta">约 <%= paper_reading_time(post.content) %> 分钟<span class="card-read">已读</span></span>
+        </a>
+      </article>
+    <% }) %>
+  </div>
+</div>

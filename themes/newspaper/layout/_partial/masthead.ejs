@@ -1,0 +1,38 @@
+<%
+  var seriesList = paper_series_list();
+  var navItems = theme.nav && theme.nav.length ? theme.nav : [{ name: '头版', path: '/' }, { name: '归档', path: '/archives/' }];
+  var siteTitle = theme.paper.title || config.title;
+  var dateText = date(new Date(), 'YYYY年M月D日 dddd');
+%>
+<header class="masthead">
+  <div class="masthead-toolbar">
+    <div class="toolbar-left">
+      <span class="toolbar-date"><%= dateText %></span>
+      <span class="toolbar-sep">·</span>
+      <span class="toolbar-issue">总 <%= paper_total_count() %> 篇</span>
+    </div>
+    <div class="toolbar-right">
+      <span class="toolbar-tagline"><%= theme.paper.tagline %></span>
+      <button class="toolbar-btn" type="button" data-theme-toggle aria-label="切换夜读模式">
+        <span class="toolbar-btn-dot" aria-hidden="true"></span><span data-theme-label>夜读</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="masthead-brand">
+    <a class="masthead-title" href="<%= url_for('/') %>"><%= siteTitle %></a>
+    <p class="masthead-sub"><%= theme.paper.subtitle || config.subtitle %></p>
+    <span class="masthead-stamp" aria-hidden="true">读</span>
+  </div>
+
+  <nav class="masthead-nav" aria-label="内容导航">
+    <% navItems.forEach(function (item, i) { %>
+      <a href="<%= url_for(item.path) %>" class="<%= is_current(item.path) ? 'active' : '' %>"><%= item.name %></a>
+      <% if (i === 0) { %>
+        <% seriesList.forEach(function (s) { %>
+          <a href="<%= url_for('/series/' + s.path + '/') %>" class="<%= is_current('/series/' + s.path + '/') ? 'active' : '' %>"><%= s.name %></a>
+        <% }) %>
+      <% } %>
+    <% }) %>
+  </nav>
+</header>

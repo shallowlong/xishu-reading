@@ -1,0 +1,117 @@
+<%
+  var all = page.posts ? page.posts.toArray() : [];
+  var limit = (theme.paper && theme.paper.front_limit) || 11;
+  var shown = all.slice(0, limit);
+  var lead = shown[0];
+  var briefs = shown.slice(1, 4);
+  var rest = shown.slice(4);
+  var seriesList = paper_series_list();
+  var latestDate = all.length ? all[0].date : new Date();
+%>
+
+<% if (!lead) { %>
+  <div class="empty-paper">
+    <h1>暂无内容</h1>
+    <p>把 Markdown 文章放进 <code>source/_posts</code>，首页会自动排版。</p>
+  </div>
+<% } else { %>
+
+<div class="front">
+  <div class="front-ticker">
+    <span class="ticker-label">导读</span>
+    <ul class="ticker-list">
+      <% shown.slice(0, 4).forEach(function (post) { %>
+        <li><a href="<%= url_for(post.path) %>"><%= post.title %></a></li>
+      <% }) %>
+    </ul>
+    <span class="ticker-count">共 <%= all.length %> 篇</span>
+  </div>
+
+  <section class="front-top">
+    <article class="lead" data-path="<%= url_for(lead.path) %>">
+      <%
+        var leadSeries = paper_series_of(lead);
+      %>
+      <div class="lead-kicker">
+        <% if (leadSeries) { %>
+          <a class="kicker" href="<%= url_for('/series/' + leadSeries.path + '/') %>"><%= leadSeries.name %></a>
+        <% } else { %>
+          <span class="kicker">最新</span>
+        <% } %>
+        <span class="kicker-date"><%= date(lead.date, 'YYYY年M月D日') %></span>
+      </div>
+
+      <h1 class="lead-title"><a href="<%= url_for(lead.path) %>"><%= lead.title %></a></h1>
+
+      <% if (lead.description) { %>
+        <p class="lead-dek"><%= lead.description %></p>
+      <% } %>
+
+      <div class="lead-excerpt">
+        <p><%= paper_excerpt(lead.content, 230) %></p>
+      </div>
+
+      <div class="meta-line">
+        <span><%= lead.author || config.author %></span>
+        <span class="sep">|</span>
+        <span><%= paper_word_count(lead.content) %> 字</span>
+        <span class="sep">|</span>
+        <span>约 <%= paper_reading_time(lead.content) %> 分钟读完</span>
+        <span class="card-read">已读</span>
+      </div>
+
+      <a class="lead-more" href="<%= url_for(lead.path) %>">展开全文 →</a>
+    </article>
+
+    <aside class="front-aside">
+      <div class="aside-block">
+        <h2 class="block-title">近期要目</h2>
+        <ol class="brief-list">
+          <% briefs.forEach(function (post, i) { %>
+            <% var bs = paper_series_of(post); %>
+            <li data-path="<%= url_for(post.path) %>">
+              <span class="brief-num"><%= ['①', '②', '③', '④', '⑤'][i] || (i + 1) %></span>
+              <div class="brief-body">
+                <a class="brief-title" href="<%= url_for(post.path) %>"><%= post.title %></a>
+                <p class="brief-dek"><%= paper_excerpt(post.content, 56) %></p>
+                <span class="brief-meta"><%= bs ? bs.name : '' %> · <%= date(post.date, 'MM-DD') %> <span class="card-read">已读</span></span>
+              </div>
+            </li>
+          <% }) %>
+        </ol>
+      </div>
+
+      <div class="aside-block">
+        <h2 class="block-title">内容系列</h2>
+        <ul class="series-list">
+          <% seriesList.forEach(function (s) { %>
+            <li>
+              <a href="<%= url_for('/series/' + s.path + '/') %>">
+                <span class="series-name"><%= s.name %></span>
+                <span class="series-count"><%= s.count %> 期</span>
+              </a>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </aside>
+  </section>
+
+  <section class="front-grid">
+    <div class="section-head">
+      <span>最近更新</span>
+      <span class="section-head-note">截至 <%= date(latestDate, 'YYYY-MM-DD') %></span>
+    </div>
+    <div class="card-grid">
+      <% rest.forEach(function (post) { %>
+        <%- partial('_partial/card', { post: post }) %>
+      <% }) %>
+    </div>
+  </section>
+
+  <div class="front-more">
+    <a href="<%= url_for('/archives/') %>">查阅全部 <%= all.length %> 篇 →</a>
+  </div>
+</div>
+
+<% } %>

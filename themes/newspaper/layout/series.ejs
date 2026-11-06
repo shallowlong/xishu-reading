@@ -1,0 +1,28 @@
+<%
+  var list = page.series_list || paper_series_list();
+  var total = 0;
+  list.forEach(function (s) { total += s.count; });
+%>
+<div class="section-front">
+  <header class="section-front-head">
+    <p class="kicker">Series</p>
+    <h1>内容系列</h1>
+    <p class="section-desc">同一个主题下的全部内容，按最近更新排序。想连着读，从这里进。</p>
+    <p class="section-meta"><%= list.length %> 个系列 · 共 <%= total %> 期</p>
+  </header>
+
+  <div class="series-cards">
+    <% list.forEach(function (s) { %>
+      <a class="series-card" href="<%= url_for('/series/' + s.path + '/') %>">
+        <span class="series-card-count"><%= s.count %> 期</span>
+        <h2 class="series-card-title"><%= s.name %></h2>
+        <% if (s.desc) { %><p class="series-card-desc"><%= s.desc %></p><% } %>
+        <p class="series-card-latest">
+          <span class="latest-label">最新</span>
+          <%= s.latest.title %>
+        </p>
+        <p class="series-card-date">更新于 <%= date(s.latest.date, 'YYYY-MM-DD') %> · 约 <%= paper_reading_time(s.latest.content) %> 分钟/期</p>
+      </a>
+    <% }) %>
+  </div>
+</div>

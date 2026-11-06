@@ -1,0 +1,19 @@
+<div class="page-wrap">
+  <article class="article" data-path="<%= url_for(page.path) %>">
+    <header class="article-head">
+      <div class="article-kicker">
+        <span class="kicker">单页</span>
+      </div>
+      <h1 class="article-title"><%= page.title %></h1>
+      <% if (page.description) { %>
+        <p class="article-dek"><%= page.description %></p>
+      <% } %>
+    </header>
+    <div class="article-body">
+      <%- page.content %>
+    </div>
+    <footer class="article-foot">
+      <p class="article-end">— 本文完 —</p>
+    </footer>
+  </article>
+</div>

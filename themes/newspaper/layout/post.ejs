@@ -1,0 +1,161 @@
+<%
+  var s = paper_series_of(page);
+  var sib = paper_siblings();
+  var toc = paper_toc(page.content);
+  var words = paper_word_count(page.content);
+  var minutes = paper_reading_time(page.content);
+  var cats = page.categories ? page.categories.toArray() : [];
+  var tags = page.tags ? page.tags.toArray() : [];
+  var updated = page.updated && page.updated.valueOf() - page.date.valueOf() > 60000;
+%>
+
+<div class="article-layout">
+  <article class="article" data-path="<%= url_for(page.path) %>">
+    <div class="mobile-tools">
+      <% if (toc.length) { %>
+        <details class="mobile-toc">
+          <summary>本文目录 · <%= toc.length %> 节</summary>
+          <ul class="toc-list">
+            <% toc.forEach(function (item) { %>
+              <li class="lvl-<%= item.level %>"><a href="#<%= item.id %>"><%= item.text %></a></li>
+            <% }) %>
+          </ul>
+        </details>
+      <% } %>
+      <div class="mobile-font">
+        <span class="mobile-font-label">字号</span>
+        <div class="font-btns">
+          <button type="button" data-font="s">小</button>
+          <button type="button" data-font="m" class="active">中</button>
+          <button type="button" data-font="l">大</button>
+        </div>
+      </div>
+    </div>
+
+    <header class="article-head">
+      <div class="article-kicker">
+        <% if (s) { %>
+          <a class="kicker" href="<%= url_for('/series/' + s.path + '/') %>"><%= s.name %></a>
+        <% } else { %>
+          <span class="kicker">阅读</span>
+        <% } %>
+        <span class="kicker-date"><%= date(page.date, 'YYYY年M月D日 dddd') %></span>
+      </div>
+
+      <h1 class="article-title"><%= page.title %></h1>
+
+      <% if (page.description) { %>
+        <p class="article-dek"><%= page.description %></p>
+      <% } %>
+
+      <div class="article-meta">
+        <span class="meta-author"><%= page.author || config.author %></span>
+        <span class="meta-sep">|</span>
+        <span><%= words %> 字</span>
+        <span class="meta-sep">|</span>
+        <span>约 <%= minutes %> 分钟</span>
+        <% if (updated) { %>
+          <span class="meta-sep">|</span>
+          <span>修订于 <%= date(page.updated, 'YYYY-MM-DD') %></span>
+        <% } %>
+      </div>
+    </header>
+
+    <div class="article-body" id="articleBody">
+      <%- page.content %>
+    </div>
+
+    <% if (cats.length || tags.length) { %>
+      <aside class="taxonomy" aria-label="分类与标签">
+        <% if (cats.length) { %>
+          <div class="taxonomy-row">
+            <span class="taxonomy-label">分类</span>
+            <span class="taxonomy-items">
+              <% cats.forEach(function (cat) { %>
+                <a class="taxonomy-item" href="<%= url_for(cat.path || ('/' + config.category_dir + '/' + cat.name + '/')) %>"><%= cat.name %></a>
+              <% }) %>
+            </span>
+          </div>
+        <% } %>
+        <% if (tags.length) { %>
+          <div class="taxonomy-row">
+            <span class="taxonomy-label">标签</span>
+            <span class="taxonomy-items">
+              <% tags.forEach(function (tag) { %>
+                <a class="taxonomy-tag" href="<%= url_for(tag.path || ('/' + config.tag_dir + '/' + tag.name + '/')) %>">#<%= tag.name %></a>
+              <% }) %>
+            </span>
+          </div>
+        <% } %>
+      </aside>
+    <% } %>
+
+    <footer class="article-foot">
+      <% if (sib && sib.series) { %>
+        <a class="series-back" href="<%= url_for('/series/' + sib.series.path + '/') %>">
+          ← 返回《<%= sib.series.name %>》全部 <%= sib.series.count %> 期
+        </a>
+      <% } %>
+
+      <% if (sib && (sib.prev || sib.next)) { %>
+        <nav class="series-nav" aria-label="同系列上下篇">
+          <% if (sib.prev) { %>
+            <a class="series-nav-item is-prev" href="<%= url_for(sib.prev.path) %>">
+              <span class="nav-label">更早一期</span>
+              <span class="nav-title"><%= sib.prev.title %></span>
+            </a>
+          <% } %>
+          <% if (sib.next) { %>
+            <a class="series-nav-item is-next" href="<%= url_for(sib.next.path) %>">
+              <span class="nav-label">更新一期</span>
+              <span class="nav-title"><%= sib.next.title %></span>
+            </a>
+          <% } %>
+        </nav>
+      <% } %>
+
+      <p class="article-end">— 本文完 —</p>
+    </footer>
+  </article>
+
+  <aside class="rail" aria-label="阅读辅助">
+    <div class="rail-block">
+      <h2 class="rail-title">读到这里</h2>
+      <p class="progress-readout"><span data-progress-percent>0%</span></p>
+      <div class="progress-track"><span data-progress-bar></span></div>
+    </div>
+
+    <% if (toc.length) { %>
+      <div class="rail-block">
+        <h2 class="rail-title">本文目录</h2>
+        <ul class="toc-list">
+          <% toc.forEach(function (item) { %>
+            <li class="lvl-<%= item.level %>"><a href="#<%= item.id %>"><%= item.text %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <div class="rail-block">
+      <h2 class="rail-title">字号</h2>
+      <div class="font-btns" role="group" aria-label="正文字号">
+        <button type="button" data-font="s">小</button>
+        <button type="button" data-font="m" class="active">中</button>
+        <button type="button" data-font="l">大</button>
+      </div>
+    </div>
+
+    <div class="rail-block rail-block-last">
+      <button type="button" class="rail-btn" data-theme-toggle>切换夜读</button>
+      <button type="button" class="rail-btn" data-to-top>回到顶部 ↑</button>
+    </div>
+  </aside>
+</div>
+
+<div class="resume" id="resumeBar" hidden>
+  <p>上次读到 <b id="resumePercent">0%</b>，接着看？</p>
+  <div class="resume-actions">
+    <button type="button" class="primary" id="resumeGo">继续读</button>
+    <button type="button" id="resumeReset">从头开始</button>
+  </div>
+</div>
