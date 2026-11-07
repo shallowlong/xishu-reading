@@ -13,12 +13,12 @@
   --rule-light: #d5cbb6;
   --accent: #8c1c13;
   --accent-soft: rgba(140, 28, 19, 0.07);
-  --serif:
-    "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun",
-    "Times New Roman", serif;
-  --sans:
-    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue",
-    Arial, sans-serif;
+  /* 主字体统一微软雅黑；保留 --serif / --sans 变量名以兼容既有样式 */
+  --font-main:
+    "Microsoft YaHei", "Microsoft YaHei UI", "微软雅黑", "PingFang SC",
+    "Hiragino Sans GB", "Helvetica Neue", Arial, sans-serif;
+  --serif: var(--font-main);
+  --sans: var(--font-main);
   --mono:
     "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --max: 1200px;

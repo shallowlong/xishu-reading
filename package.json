@@ -5,15 +5,17 @@
   "author": "XISHU <shallowlong@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "hexo clean && hexo server -p 7777",
-    "serve": "hexo server -p 7777",
+    "dev": "hexo clean && hexo server -p 7788",
+    "serve": "hexo server -p 7788",
     "build": "hexo generate",
     "clean": "hexo clean",
     "new": "hexo new",
     "new:insight": "node tools/new-post.js insight",
     "new:insight-weekly": "node tools/new-post.js insight-weekly",
     "new:weekly": "node tools/new-post.js weekly",
-    "new:zhihu": "node tools/new-post.js zhihu"
+    "new:zhihu": "node tools/new-post.js zhihu",
+    "commit:content": "node tools/auto-commit.js",
+    "commit:content:dry": "node tools/auto-commit.js --dry-run"
   },
   "hexo": {
     "version": "8.1.2"

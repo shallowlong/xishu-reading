@@ -13,7 +13,7 @@ paper:
   # 版权起始年：页脚自动显示 2026 或 2026-2027（结束年取构建时的年份）
   since: 2026
   # 静态资源版本号，改样式后 +1 可破缓存
-  version: 3
+  version: 4
 
 # 顶部导航（系列会自动追加在后面）
 nav:
@@ -37,7 +37,7 @@ series:
   ai-ecom-weekly:
     name: AI 驱动服装电商
     path: ai-ecom-weekly
-    desc: 每周一份 AI × 服装电商趋势周报，面向童装 / 女装 / 男装卖家。
+    desc: 每周一份 AI × 服装电商趋势周报，面向 童装 / 服饰类 卖家。
   zhihu-top:
     name: 知乎高赞精选
     path: zhihu-top
