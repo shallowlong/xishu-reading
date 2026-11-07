@@ -1,0 +1,10 @@
+<%
+  var lic = theme.license || {};
+  var scope = typeof scope !== 'undefined' ? scope : '本文';
+  var name = lic.name || '署名-非商业性使用-相同方式共享 4.0 国际';
+  var url = lic.url || 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh';
+  var note = lic.note || '转载请注明出处';
+%>
+<div class="license">
+  <p><%= scope %>采用 <a href="<%= url %>" rel="license noopener" target="_blank"><%= name %></a> 许可协议，<%= note %>。</p>
+</div>

@@ -13,7 +13,13 @@ paper:
   # 版权起始年：页脚自动显示 2026 或 2026-2027（结束年取构建时的年份）
   since: 2026
   # 静态资源版本号，改样式后 +1 可破缓存
-  version: 4
+  version: 6
+
+# 许可协议：显示在每篇文章底部与页脚
+license:
+  name: 署名-非商业性使用-相同方式共享 4.0 国际
+  url: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh
+  note: 转载请注明出处
 
 # 顶部导航（系列会自动追加在后面）
 nav:

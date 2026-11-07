@@ -13,6 +13,7 @@
   <meta name="description" content="<%= pageDesc %>">
   <meta name="author" content="<%= page.author || config.author %>">
   <link rel="canonical" href="<%= pageUrl %>">
+  <% if (theme.license && theme.license.url) { %><link rel="license" href="<%= theme.license.url %>"><% } %>
   <meta property="og:type" content="<%= page.layout === 'post' ? 'article' : 'website' %>">
   <meta property="og:title" content="<%= page.title || siteTitle %>">
   <meta property="og:description" content="<%= pageDesc %>">

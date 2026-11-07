@@ -1030,6 +1030,38 @@ a.kicker:hover {
   color: var(--ink-faint);
 }
 
+/* 许可协议（文章底部 + 页脚） */
+
+.license {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule-light);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--ink-faint);
+  text-align: center;
+}
+.license p { margin: 0; }
+.license a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.license a:hover { color: var(--accent); }
+
+.foot-license {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 16px var(--gutter) 0;
+  border-top: 1px solid var(--rule-light);
+}
+.foot-license .license {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 /* 侧栏 */
 
 .rail {
