@@ -14,6 +14,8 @@
     "new:insight-weekly": "node tools/new-post.js insight-weekly",
     "new:weekly": "node tools/new-post.js weekly",
     "new:zhihu": "node tools/new-post.js zhihu",
+    "new:image": "node tools/new-post.js image-prompt",
+    "sync:image": "node tools/sync-image-prompt.js",
     "commit:content": "node tools/auto-commit.js",
     "commit:content:dry": "node tools/auto-commit.js --dry-run"
   },

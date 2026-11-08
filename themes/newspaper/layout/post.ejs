@@ -59,36 +59,36 @@
           <span>修订于 <%= date(page.updated, 'YYYY-MM-DD') %></span>
         <% } %>
       </div>
+
+      <% if (cats.length || tags.length) { %>
+        <aside class="taxonomy" aria-label="分类与标签">
+          <% if (cats.length) { %>
+            <div class="taxonomy-row">
+              <span class="taxonomy-label">分类</span>
+              <span class="taxonomy-items">
+                <% cats.forEach(function (cat) { %>
+                  <a class="taxonomy-item" href="<%= url_for(cat.path || ('/' + config.category_dir + '/' + cat.name + '/')) %>"><%= cat.name %></a>
+                <% }) %>
+              </span>
+            </div>
+          <% } %>
+          <% if (tags.length) { %>
+            <div class="taxonomy-row">
+              <span class="taxonomy-label">标签</span>
+              <span class="taxonomy-items">
+                <% tags.forEach(function (tag) { %>
+                  <a class="taxonomy-tag" href="<%= url_for(tag.path || ('/' + config.tag_dir + '/' + tag.name + '/')) %>">#<%= tag.name %></a>
+                <% }) %>
+              </span>
+            </div>
+          <% } %>
+        </aside>
+      <% } %>
     </header>
 
     <div class="article-body" id="articleBody">
       <%- page.content %>
     </div>
-
-    <% if (cats.length || tags.length) { %>
-      <aside class="taxonomy" aria-label="分类与标签">
-        <% if (cats.length) { %>
-          <div class="taxonomy-row">
-            <span class="taxonomy-label">分类</span>
-            <span class="taxonomy-items">
-              <% cats.forEach(function (cat) { %>
-                <a class="taxonomy-item" href="<%= url_for(cat.path || ('/' + config.category_dir + '/' + cat.name + '/')) %>"><%= cat.name %></a>
-              <% }) %>
-            </span>
-          </div>
-        <% } %>
-        <% if (tags.length) { %>
-          <div class="taxonomy-row">
-            <span class="taxonomy-label">标签</span>
-            <span class="taxonomy-items">
-              <% tags.forEach(function (tag) { %>
-                <a class="taxonomy-tag" href="<%= url_for(tag.path || ('/' + config.tag_dir + '/' + tag.name + '/')) %>">#<%= tag.name %></a>
-              <% }) %>
-            </span>
-          </div>
-        <% } %>
-      </aside>
-    <% } %>
 
     <footer class="article-foot">
       <% if (sib && sib.series) { %>
@@ -150,6 +150,9 @@
     <div class="rail-block rail-block-last">
       <button type="button" class="rail-btn" data-theme-toggle>切换夜读</button>
       <button type="button" class="rail-btn" data-to-top>回到顶部 ↑</button>
+      <% if (sib && sib.series) { %>
+        <a class="rail-btn rail-series-back" href="<%= url_for('/series/' + sib.series.path + '/') %>">← 返回《<%= sib.series.name %>》全部 <%= sib.series.count %> 期</a>
+      <% } %>
     </div>
   </aside>
 </div>

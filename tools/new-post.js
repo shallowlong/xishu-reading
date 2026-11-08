@@ -6,6 +6,7 @@
  *   npm run new:insight-weekly  -- 261011-261017
  *   npm run new:weekly          -- 260914-260920
  *   npm run new:zhihu           -- 1011
+ *   npm run new:image           -- 0904
  *
  * 不传后缀时：日报/精选用当天 MMDD；周报用本周一至周日；
  * ai-insight-weekly 用 YYMMDD-YYMMDD（与日报的 YYMMDD 命名保持一致）。
@@ -24,7 +25,8 @@ const PRESETS = {
   insight: { layout: 'ai-insight', dir: 'ai-insight', prefix: 'AI政策洞察日报', suffix: 'day' },
   'insight-weekly': { layout: 'ai-insight-weekly', dir: 'ai-insight-weekly', prefix: 'AI政策洞察周报', suffix: 'week6' },
   weekly: { layout: 'ai-ecom-weekly', dir: 'ai-ecom-weekly', prefix: 'AI驱动服装电商周报', suffix: 'week6' },
-  zhihu: { layout: 'zhihu-top', dir: 'zhihu-top', prefix: '知乎高赞精选', suffix: 'day' }
+  zhihu: { layout: 'zhihu-top', dir: 'zhihu-top', prefix: '知乎高赞精选', suffix: 'day' },
+  'image-prompt': { layout: 'image-prompt-daily', dir: 'image-prompt-daily', prefix: '风格图片提示词日报', suffix: 'day' }
 };
 
 function pad(value) {
@@ -68,7 +70,7 @@ const type = process.argv[2];
 const preset = PRESETS[type];
 
 if (!preset) {
-  console.error('用法: node tools/new-post.js <insight|insight-weekly|weekly|zhihu> [后缀，如 1011 或 261011-261017]');
+  console.error('用法: node tools/new-post.js <insight|insight-weekly|weekly|zhihu|image-prompt> [后缀，如 1011 或 261011-261017]');
   process.exit(1);
 }
 
